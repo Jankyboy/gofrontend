@@ -37,6 +37,11 @@ func unminit() {
 	unminitSignals()
 }
 
+// Called from exitm, but not from drop, to undo the effect of thread-owned
+// resources in minit, semacreate, or elsewhere. Do not take locks after calling this.
+func mdestroy(mp *m) {
+}
+
 var urandom_dev = []byte("/dev/urandom\x00")
 
 func getRandomData(r []byte) {
@@ -52,7 +57,7 @@ func getRandomData(r []byte) {
 }
 
 //go:noescape
-//extern pipe
+//extern-sysinfo pipe
 func libcPipe(*[2]int32) int32
 
 func pipe() (r, w int32, e int32) {
@@ -65,7 +70,7 @@ func pipe() (r, w int32, e int32) {
 }
 
 //go:noescape
-//extern pipe2
+//extern-sysinfo pipe2
 func libcPipe2(*[2]int32, int32) int32
 
 func pipe2(flags int32) (r, w int32, e int32) {
